@@ -1,0 +1,4 @@
+{'Channels': '0, 1', 'Sensitivity': '500', 'Requested scan rate': '300', 'Actual scan rate': '299.0', 'Samples per channel': '3000', 'Start Time': '2023-09-27 00:53:19.204903', 'End Time': '2023-09-27 00:53:29.246938'}
+
+{'Channels': '0, 1', 'Sensitivity': '500', 'Requested scan rate': '200', 'Actual scan rate': '200.0', 'Samples per channel': '60000', 'Start Time': '2023-10-19 13:03:15.223574', 'End Time': '2023-10-19 13:08:15.256295'}
+{'Channels': '0, 1', 'Sensitivity': '500', 'Requested scan rate': '200', 'Actual scan rate': '200.0', 'Samples per channel': '2000', 'Start Time': '2023-10-19 13:12:58.770487', 'End Time': '2023-10-19 13:13:08.812542'}
