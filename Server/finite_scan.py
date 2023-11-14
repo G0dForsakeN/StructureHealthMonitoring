@@ -15,10 +15,6 @@ def mainFiniteScan(myDict):
     ERASE_TO_END_OF_LINE = '\x1b[0K'
     actScanRate = ""
     try:
-        #myDict = {}
-        #file_path = "/home/pi/Desktop/sensorParameters.txt"
-        #with open(file_path, 'r') as file:
-        #    myDict = eval(file.readline().strip('\n'))
         SAMPLERATE = int(myDict["SAMPLERATE"])
         SAMPLEDURATION = int(myDict["SAMPLEDURATION"])
         SENS = int(myDict["SENSITIVITY"])
