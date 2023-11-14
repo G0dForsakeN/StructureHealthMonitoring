@@ -8,10 +8,6 @@ from pymongo.server_api import ServerApi
 from finite_scan import mainFiniteScan
 import pandas as pd
 
-file_path = "/home/pi/Desktop/randomText.txt"
-with open(file_path, "w") as file:
-	file.write("Hello World!\n")
-	
 
 time.sleep(60)
 mqttBroker = "mqtt.eclipseprojects.io"
