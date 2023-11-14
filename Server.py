@@ -1,19 +1,29 @@
-import paho.mqtt.client as mqtt
+
+
+#import subprocess
+#import sys
+
+#venv_activate_command = "/home/pi/Desktop/SHMCode/SHM/bin/activate"
+#subprocess.run([venv_activate_command, "&&", "/usr/bin/python3", "/home/pi/Desktop/SHMCode/Server.py"])
 import datetime
 import threading
-from finite_scan import mainFiniteScan
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-import pandas as pd
 import schedule
 import time
-
+import paho.mqtt.client as mqtt
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+from finite_scan import mainFiniteScan
+import pandas as pd
+#time.sleep(60)
 mqttBroker = "mqtt.eclipseprojects.io"
 client = mqtt.Client("RPI")
-autoConfDict = {'Timer':24}
-sensorParamDict = {'SAMPLERATE': 200, 'SAMPLEDURATION': 300, 'SENSITIVITY': 500}
+autoConfDict = {'Timer':10}
+sensorParamDict = {'SAMPLERATE': 200, 'SAMPLEDURATION': 10, 'SENSITIVITY': 500}
 metaData = {}
 
+#file_path = "/home/pi/Desktop/randomText.txt"
+#with open(file_path, "w") as file:
+#file.write("Hello World!\n")
 def uploadToCloud(metaData):
     uri = "mongodb+srv://admin:W176xRINyYUOZCKE@cluster0.r000trc.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(uri, server_api=ServerApi('1'))
@@ -25,6 +35,7 @@ def uploadToCloud(metaData):
     print("Success: Data uploaded to MongoDB")
     
 def decode_messgae(text,time):
+    print(text)
     if text == "START":
         print("STARTING REMOTE SENSING JOB")
         actual_scan_rate, metaData = mainFiniteScan(sensorParamDict)
@@ -65,14 +76,26 @@ def main():
     client.loop_forever()
 
 def main2():
-    def run_scan():
-        actual_scan_rate, metaData = mainFiniteScan(sensorParamDict)
+    value = autoConfDict["Timer"]
+    time.sleep(value*60)
     while True:
-        value = autoConfDict['Timer']
+        value = autoConfDict["Timer"]
         if value is not None:
-            schedule.every(value).hours.do(run_scan)
-        schedule.run_pending()
-        time.sleep(1)
+            actual_scan_rate, metaData = mainFiniteScan(sensorParamDict)
+            uploadToCloud(metaData)
+        time.sleep(value*60)
+   # def run_scan():
+    #    actual_scan_rate, metaData = mainFiniteScan(sensorParamDict)
+     #   print("Actual Scan Rate: ", actual_scan_rate)
+     #   #client.publish("RETURNSCANRATE", actual_scan_rate)
+      #  thread3 = threading.Thread(target=uploadToCloud, args=(metaData,))
+       # thread3.start()
+    #while True:
+     #   value = autoConfDict['Timer']
+      #  if value is not None:
+       #     schedule.every(value).hours.do(run_scan)
+       # schedule.run_pending()
+       # time.sleep(1)
     
 thread1 = threading.Thread(target=main)
 thread2 = threading.Thread(target=main2)

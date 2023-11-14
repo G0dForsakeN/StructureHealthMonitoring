@@ -7,12 +7,12 @@ from daqhats_utils import select_hat_device, enum_mask_to_string, \
 chan_list_to_mask
 import pandas as pd
 import datetime
-CURSOR_BACK_2 = '\x1b[2D'
-ERASE_TO_END_OF_LINE = '\x1b[0K'
-lstChn0 = []
-lstChn1 = []
+import os
 metaData = {}
-def mainFiniteScan(myDict): 
+
+def mainFiniteScan(myDict):
+    CURSOR_BACK_2 = '\x1b[2D'
+    ERASE_TO_END_OF_LINE = '\x1b[0K'
     actScanRate = ""
     try:
         #myDict = {}
@@ -22,7 +22,7 @@ def mainFiniteScan(myDict):
         SAMPLERATE = int(myDict["SAMPLERATE"])
         SAMPLEDURATION = int(myDict["SAMPLEDURATION"])
         SENS = int(myDict["SENSITIVITY"])
-        SAMP = SAMPLEDURATION*SAMPLERATE
+        SAMP = int(SAMPLEDURATION*SAMPLERATE/2)
         sensitivity = SENS
         samples_per_channel = SAMP
         scan_rate = SAMPLERATE
@@ -85,17 +85,21 @@ def mainFiniteScan(myDict):
     except (HatError, ValueError) as err:
         print('\n', err)
     return actScanRate, metaData
-def calc_rms(data, channel, num_channels, num_samples_per_channel):
+    
+def calc_rms(data, channel, num_channels, num_samples_per_channel, lstChn0, lstChn1):
     print(data)
-    lstChn0.extend(data[::2])
-    lstChn1.extend(data[1::2])
+    lstChn0.extend(round(value,6) for value in data[::2])
+    lstChn1.extend(round(value,6) for value in data[1::2])
     value = 0.0
     index = channel
     for _i in range(num_samples_per_channel):
         value += (data[index] * data[index]) / num_samples_per_channel
         index += num_channels
     return sqrt(value)
+    
 def read_and_display_data(hat, samples_per_channel, num_channels):
+    lstChn0 = []
+    lstChn1 = []
     total_samples_read = 0
     read_request_size = 1000
     timeout = 5.0
@@ -109,14 +113,20 @@ def read_and_display_data(hat, samples_per_channel, num_channels):
             break
         samples_read_per_channel = int(len(read_result.data) / num_channels)
         total_samples_read += samples_read_per_channel
+        # lstChn0 lstChn1 data
+        
+        # ==============================================================
         print('\r{:12}'.format(samples_read_per_channel),
               ' {:12}'.format(total_samples_read), end='')
         if samples_read_per_channel > 0:
             for i in range(num_channels):
                 value = calc_rms(read_result.data, i, num_channels,
-                                 samples_read_per_channel)
+                                 samples_read_per_channel, lstChn0, lstChn1)
                 print('{:14.5f}'.format(value), end='')
             stdout.flush()
+        # ==============================================================
+    print(lstChn0)
+    print(metaData)
     metaData['End Time'] = str(datetime.datetime.now()) 
     print("\n Sesnsing Job Complete!")
     print('\n')
