@@ -1,4 +1,4 @@
-#!/home/pi/Desktop/SHMCode/SHM/bin/python3
+#!/home/pi/Desktop/SHMCode/Server/SHM/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
