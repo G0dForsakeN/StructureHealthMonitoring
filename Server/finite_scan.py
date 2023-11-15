@@ -18,7 +18,7 @@ def mainFiniteScan(myDict):
         SAMPLERATE = int(myDict["SAMPLERATE"])
         SAMPLEDURATION = int(myDict["SAMPLEDURATION"])
         SENS = int(myDict["SENSITIVITY"])
-        SAMP = int(SAMPLEDURATION*SAMPLERATE/2)
+        SAMP = int(SAMPLEDURATION*SAMPLERATE)
         sensitivity = SENS
         samples_per_channel = SAMP
         scan_rate = SAMPLERATE
@@ -115,7 +115,8 @@ def read_and_display_data(hat, samples_per_channel, num_channels):
         print('\r{:12}'.format(samples_read_per_channel),
               ' {:12}'.format(total_samples_read), end='')
         if samples_read_per_channel > 0:
-            for i in range(num_channels):
+            #for i in range(num_channels):
+            for i in range(0,1):
                 value = calc_rms(read_result.data, i, num_channels,
                                  samples_read_per_channel, lstChn0, lstChn1)
                 print('{:14.5f}'.format(value), end='')
