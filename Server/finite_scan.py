@@ -17,16 +17,21 @@ def mainFiniteScan(myDict):
     try:
         SAMPLERATE = int(myDict["SAMPLERATE"])
         SAMPLEDURATION = int(myDict["SAMPLEDURATION"])
-        SENS = int(myDict["SENSITIVITY"])
+        # SENS = int(myDict["SENSITIVITY"])
         SAMP = int(SAMPLEDURATION*SAMPLERATE)
-        sensitivity = SENS
+        # sensitivity = SENS
         samples_per_channel = SAMP
         scan_rate = SAMPLERATE
+        sensChn0 = int(myDict["SENSITIVITY0"])
+        sensChn1 = int(myDict["SENSITIVITY1"])
     except:
-        sensitivity = 1000.0
+        # sensitivity = 1000.0
+        sensChn0 = 1000.0
+        sensChn1 = 1000.9
         samples_per_channel = 50000
         scan_rate = 10240.0
-    print("Sensitivity: ", sensitivity)
+    print("Sensitivity Channel 0: ", sensChn0)
+    print("Sensitivity Channel 1: ", sensChn1)
     print("Samples Per Channel: ", samples_per_channel)
     print("Sampling frequency: ", scan_rate) 
     channels = [0, 1]
@@ -40,7 +45,10 @@ def mainFiniteScan(myDict):
         iepe_enable = 1
         for channel in channels:
             hat.iepe_config_write(channel, iepe_enable)
-            hat.a_in_sensitivity_write(channel, sensitivity)
+            if channel == 0:
+                hat.a_in_sensitivity_write(channel, sensChn0)
+            else:
+                hat.a_in_sensitivity_write(channel, sensChn1)
         hat.a_in_clock_config_write(SourceType.LOCAL, scan_rate)
         synced = False
         while not synced:
@@ -54,14 +62,16 @@ def mainFiniteScan(myDict):
             print('off')
         print('    Channels: ', end='')
         print(', '.join([str(chan) for chan in channels]))
-        print('    Sensitivity: ', sensitivity)
+        print('    Sensitivity Channel 0: ', sensChn0)
+        print('    Sensitivity Channel 1: ', sensChn1)
         print('    Requested scan rate: ', scan_rate)
         print('    Actual scan rate: ', actual_scan_rate)
         print('    Samples per channel', samples_per_channel)
         print('    Options: ', enum_mask_to_string(OptionFlags, options))
         actScanRate = str(actual_scan_rate)
         metaData['Channels'] = ', '.join([str(chan) for chan in channels])
-        metaData['Sensitivity'] = str(sensitivity)
+        metaData['Sensitivity Channel 0'] = str(sensChn0)
+        metaData['Sensitivity Channel 1'] = str(sensChn1)
         metaData['Requested scan rate'] = str(scan_rate)
         metaData['Actual scan rate'] = str(actual_scan_rate)
         metaData['Samples per channel'] = str(samples_per_channel)
@@ -122,7 +132,6 @@ def read_and_display_data(hat, samples_per_channel, num_channels):
                 print('{:14.5f}'.format(value), end='')
             stdout.flush()
         # ==============================================================
-    print(lstChn0)
     print(metaData)
     metaData['End Time'] = str(datetime.datetime.now()) 
     print("\n Sesnsing Job Complete!")
